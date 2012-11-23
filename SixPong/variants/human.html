@@ -1,0 +1,511 @@
+<html>
+	<head>
+		<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>
+		<script src='src/js/three.min.js'></script>
+		<script src='src/js/leap.js'></script>
+	</head>
+	<body onResize="adjust_window()" bgcolor="black">
+		<h1 id ="score" style="color:white"></h1>
+	</body>
+	<script>
+		//CONSTANTS
+		var MODE="human"
+		var HELPERS=false
+		var PADWIDTH=30
+		var PADTHICKNESS=5
+		var GAMEOFFSET=100
+		var FRICTION=.7
+		var BALLRAD=10
+		var MAX_ACCELERATION=1
+		//Variables
+		var score=0
+		var hiscore=0
+		var objlist = []
+		paddles=[]
+		var scene=new THREE.Scene();
+		var renderer=new THREE.WebGLRenderer();
+		renderer.setClearColorHex(0x000000,1)
+		var zoom=125
+		var leappos={x:0,y:0,z:0}
+		renderer.setSize(window.innerWidth,window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var camera=new THREE.PerspectiveCamera(50,window.innerWidth/window.innerHeight, 1,100000);
+				
+		adjust_window=function(){
+			console.log('window reized')
+			renderer.setSize(window.innerWidth,window.innerHeight)
+			camera.aspect=window.innerWidth,window.innerHeight
+		}
+		//Utilities
+		function randomize_velocity(){
+			if (score>hiscore)
+			{
+				hiscore=score
+			}
+			score=0
+			return {x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()*2-1}
+		}
+		function reset(pad){
+		if (pad.mesh.position.x!=100)
+	        {pad.mesh.position.x=0}
+		if (pad.mesh.position.y!=100)
+	        {pad.mesh.position.y=0}
+		if (pad.mesh.position.z!=100)
+		{pad.mesh.position.z=0}
+		}
+		function stop(pad) {pad.set_right_acceleration(0);pad.set_up_acceleration(0)}
+		function fs(pad){stop(pad);reset(pad)}
+		function right(pad){pad.set_right_acceleration(.02)}
+		function up(pad){pad.set_up_acceleration(.02)}
+		//Classes
+		function Paddle(width,thickness,color,axis1,axis2){
+			this.mesh=new THREE.Mesh(new THREE.CubeGeometry(width,width,thickness),new THREE.MeshBasicMaterial({color:color,wireframe:true}))
+			scene.add(this.mesh)
+			objlist.push(this)
+			paddles.push(this)
+			this.velocity={x:0,y:0,z:0}	
+			this.acceleration={x:0,y:0,z:0}
+			this.axis1=axis1
+			this.axis2=axis2
+			this.update=function(){
+				//Wall collision
+				if (this.mesh.position.x+this.velocity.x>GAMEOFFSET)
+				{
+					this.velocity.x=0
+					if (this.acceleration.x>0)
+					{
+						this.acceleration.x=0
+					}
+				}
+				if (this.mesh.position.x+this.velocity.x<-GAMEOFFSET)
+				{
+					this.velocity.x=0
+					if (this.acceleration.x<0)
+					{
+						this.acceleration.x=0
+					}
+				}
+				if (this.mesh.position.y+this.velocity.y>GAMEOFFSET)
+				{
+					this.velocity.y=0
+					if (this.acceleration.y>0)
+					{
+						this.acceleration.y=0
+					}
+				}
+				if (this.mesh.position.y+this.velocity.y<-GAMEOFFSET)
+				{
+					this.velocity.y=0
+					if (this.acceleration.y<0)
+					{
+						this.acceleration.y=0
+					}
+				}
+				if (this.mesh.position.z-this.velocity.z>GAMEOFFSET)
+				{
+					this.velocity.z=0
+					if (this.acceleration.z<0)
+					{
+						this.acceleration.z=0
+					}
+				}
+				if (this.mesh.position.z-this.velocity.z<-GAMEOFFSET)
+				{
+					this.velocity.z=0
+					if (this.acceleration.z>0)
+					{
+						this.acceleration.z=0
+					}
+				}
+				//Kinematics
+				this.velocity.x+=this.acceleration.x
+				this.velocity.y+=this.acceleration.y
+				this.velocity.z+=this.acceleration.z
+				this.mesh.position.x+=this.velocity.x
+				this.mesh.position.y+=this.velocity.y
+				this.mesh.position.z-=this.velocity.z
+				
+				//Apply Friction
+				this.velocity.x-=FRICTION*this.velocity.x	
+				this.velocity.y-=FRICTION*this.velocity.y	
+				this.velocity.z-=FRICTION*this.velocity.z	
+			}
+			this.set_right_acceleration=function(a){
+				this.acceleration[axis1]=a
+			}
+			this.set_up_acceleration=function(a){
+				this.acceleration[axis2]=a
+			}
+
+		}		
+		function Player(pad1,pad2,behavior){
+			objlist.push(this)
+			this.score=0
+			this.pad1=pad1
+			this.pad2=pad2
+			this.max_acceleration=MAX_ACCELERATION
+			this.up1=false
+			this.down1=false
+			this.left1=false
+			this.right1=false
+			this.up2=false
+			this.down2=false
+			this.left2=false
+			this.right2=false
+			this.behavior={
+				ai:function(){
+					this.pad1.mesh.position[this.pad1.axis1]=ball.position[this.pad1.axis1]
+					this.pad1.mesh.position[this.pad1.axis2]=ball.position[this.pad1.axis2]
+					this.pad2.mesh.position[this.pad2.axis1]=ball.position[this.pad2.axis1]
+					this.pad2.mesh.position[this.pad2.axis2]=ball.position[this.pad2.axis2]
+				},
+				human:function(){
+					this.up1=keys[KeyEvent.DOM_VK_W]
+					this.down1=keys[KeyEvent.DOM_VK_S]
+					this.left1=keys[KeyEvent.DOM_VK_A]
+					this.right1=keys[KeyEvent.DOM_VK_D]
+					this.up2=keys[KeyEvent.DOM_VK_UP]
+					this.down2=keys[KeyEvent.DOM_VK_DOWN]
+					this.left2=keys[KeyEvent.DOM_VK_LEFT]
+					this.right2=keys[KeyEvent.DOM_VK_RIGHT]
+				},
+				network:function(){
+
+				},
+				leap:function(){
+					this.pad1.mesh.position[this.pad1.axis1]=leappos[this.pad1.axis1]
+					this.pad1.mesh.position[this.pad1.axis2]=leappos[this.pad1.axis2]
+					this.pad2.mesh.position[this.pad2.axis1]=leappos[this.pad2.axis1]
+					this.pad2.mesh.position[this.pad2.axis2]=leappos[this.pad2.axis2]
+				}
+			}[behavior]
+			this.update=function(){
+				this.behavior()
+				if (this.up1 && !(this.down1)){
+					this.pad1.set_up_acceleration(this.max_acceleration)
+				}
+				else if (this.down1 && !(this.up1)){
+					this.pad1.set_up_acceleration(-this.max_acceleration)
+				}
+				else{
+					this.pad1.set_up_acceleration(0)
+				}
+				if (this.right1 && !(this.left1)){
+					this.pad1.set_right_acceleration(this.max_acceleration)
+				}
+				else if (this.left1 && !(this.right1)){
+					this.pad1.set_right_acceleration(-this.max_acceleration)
+				}
+				else{
+					this.pad1.set_right_acceleration(0)
+				}
+				if (this.up2 && !(this.down2)){
+					this.pad2.set_up_acceleration(this.max_acceleration)
+				}
+				else if (this.down2 && !(this.up2)){
+					this.pad2.set_up_acceleration(-this.max_acceleration)
+				}
+				else{
+					this.pad2.set_up_acceleration(0)
+				}
+				if (this.right2 && !(this.left2)){
+					this.pad2.set_right_acceleration(this.max_acceleration)
+				}
+				else if (this.left2 && !(this.right2)){
+					this.pad2.set_right_acceleration(-this.max_acceleration)
+				}
+				else{
+					this.pad2.set_right_acceleration(0)
+				}
+			}
+		}	
+		function Ball()
+		{
+			this.velocity={x:0,y:0,z:0}
+			this.position={x:0,y:0,z:0}
+			this.mesh=new THREE.Mesh(new THREE.SphereGeometry(BALLRAD,10,10),new THREE.MeshBasicMaterial({color:{r:1,g:1,b:1},wireframe:true}))
+			this.lasthit=null
+			scene.add(this.mesh)
+			objlist.push(this)
+			this.update=function(){
+				if (this.lasthit){
+					this.mesh.material.color=this.lasthit.pad1.mesh.material.color
+				}
+				else{
+					this.mesh.material.color={r:1,g:1,b:1}
+				}
+				//Collision detection
+				if (this.position.x+BALLRAD+this.velocity.x>GAMEOFFSET)
+				{
+					if (pxpad.mesh.position.y-PADWIDTH/2<this.position.y+BALLRAD && pxpad.mesh.position.y+PADWIDTH/2>this.position.y -BALLRAD && pxpad.mesh.position.z-PADWIDTH/2<this.position.z+BALLRAD && pxpad.mesh.position.z+PADWIDTH/2>this.position.z -BALLRAD){
+						this.velocity.x*=-1
+						this.lasthit=player1
+						score+=1
+					}
+					else{
+						player1.score-=1
+						ball.velocity=randomize_velocity()
+						if (this.lasthit){
+							this.lasthit.score+=2
+							this.lasthit=null
+						}
+						this.position={x:0,y:0,z:0}
+					}
+				}
+				if (this.position.x-BALLRAD+this.velocity.x<-GAMEOFFSET)
+				{
+					if (nxpad.mesh.position.y-PADWIDTH/2<this.position.y+BALLRAD && nxpad.mesh.position.y+PADWIDTH/2>this.position.y -BALLRAD && nxpad.mesh.position.z-PADWIDTH/2<this.position.z+BALLRAD && nxpad.mesh.position.z+PADWIDTH/2>this.position.z -BALLRAD){
+						this.velocity.x*=-1
+						this.lasthit=player2
+						score+=1
+					}
+					else{
+						player2.score-=1
+						ball.velocity=randomize_velocity()
+						if (this.lasthit){
+							this.lasthit.score+=2
+							this.lasthit=null
+						}
+						this.position={x:0,y:0,z:0}
+					}
+				}
+				if (this.position.y+BALLRAD+this.velocity.y>GAMEOFFSET)
+				{
+					if (pypad.mesh.position.x-PADWIDTH/2<this.position.x+BALLRAD && pypad.mesh.position.x+PADWIDTH/2>this.position.x -BALLRAD && pypad.mesh.position.z-PADWIDTH/2<this.position.z+BALLRAD && pypad.mesh.position.z+PADWIDTH/2>this.position.z -BALLRAD){
+						this.velocity.y*=-1
+						this.lasthit=player2
+						score+=1
+					}
+					else{
+						player2.score-=1
+						ball.velocity=randomize_velocity()
+						if (this.lasthit){
+							this.lasthit.score+=2
+							this.lasthit=null
+						}
+						this.position={x:0,y:0,z:0}
+					}
+				}
+				if (this.position.y-BALLRAD+this.velocity.y<-GAMEOFFSET)
+				{
+					if (nypad.mesh.position.x-PADWIDTH/2<this.position.x+BALLRAD && nypad.mesh.position.x+PADWIDTH/2>this.position.x -BALLRAD && nypad.mesh.position.z-PADWIDTH/2<this.position.z+BALLRAD && nypad.mesh.position.z+PADWIDTH/2>this.position.z -BALLRAD){
+						this.velocity.y*=-1
+						this.lasthit=player3
+						score+=1
+					}
+					else{
+						player3.score-=1
+						ball.velocity=randomize_velocity()
+						if (this.lasthit){
+							this.lasthit.score+=2
+							this.lasthit=null
+						}
+						this.position={x:0,y:0,z:0}
+					}
+				}
+				if (this.position.z-BALLRAD-this.velocity.z<-GAMEOFFSET)
+				{
+					if (nzpad.mesh.position.y-PADWIDTH/2<this.position.y+BALLRAD && nzpad.mesh.position.y+PADWIDTH/2>this.position.y -BALLRAD && nzpad.mesh.position.x-PADWIDTH/2<this.position.x+BALLRAD && nzpad.mesh.position.x+PADWIDTH/2>this.position.x -BALLRAD){
+						this.velocity.z*=-1
+						this.lasthit=player3
+						score+=1
+					}
+					else{
+						player3.score-=1
+						ball.velocity=randomize_velocity()
+						if (this.lasthit){
+							this.lasthit.score+=2
+							this.lasthit=null
+						}
+						this.position={x:0,y:0,z:0}
+					}
+				}
+				if (this.position.z+BALLRAD-this.velocity.z>GAMEOFFSET)
+				{
+					if (pzpad.mesh.position.y-PADWIDTH/2<this.position.y+BALLRAD && pzpad.mesh.position.y+PADWIDTH/2>this.position.y -BALLRAD && pzpad.mesh.position.x-PADWIDTH/2<this.position.x+BALLRAD && pzpad.mesh.position.x+PADWIDTH/2>this.position.x -BALLRAD){
+						this.velocity.z*=-1
+						this.lasthit=player1
+						score+=1
+					}
+					else{
+						player1.score-=1
+						ball.velocity=randomize_velocity()
+						if (this.lasthit){
+							this.lasthit.score+=2
+							this.lasthit=null
+						}
+						this.position={x:0,y:0,z:0}
+					}
+				}
+				this.position.x+=this.velocity.x
+				this.position.y+=this.velocity.y
+				this.position.z-=this.velocity.z
+				this.mesh.position=this.position
+			}
+		}
+		//EventHandlers
+		function preventDefault(e) {
+ 			 e = e || window.event;
+  			if (e.preventDefault)
+      			e.preventDefault();
+  			e.returnValue = false;  
+		}
+		var keys=[]
+		var scrollkeys = [37, 38, 39, 40];
+		function keydown(e)
+		{
+			for (var i = scrollkeys.length; i--;) {
+		        if (e.keyCode === scrollkeys[i]) {
+		            preventDefault(e);
+		        }
+	    	}
+			keys[e.keyCode]=true
+		}
+		function keyup(e)
+		{
+			keys[e.keyCode]=false
+		}
+		document.onkeyup=keyup
+		document.onkeydown=keydown	
+		
+		//Init
+		camera.rotation={x:-Math.PI/4-.3,y:Math.PI/4,z:Math.PI/4}
+		camera.position={x:2*zoom,y:1.52*zoom,z:0.76*zoom}
+
+		var pzpad=new Paddle(PADWIDTH,PADTHICKNESS,0x00CD00,'x','y')
+		pzpad.mesh.position.z=GAMEOFFSET
+		var nzpad=new Paddle(PADWIDTH,PADTHICKNESS,0xff0000,'x','y')
+		nzpad.mesh.position.z=-GAMEOFFSET
+		var pxpad=new Paddle(PADWIDTH,PADTHICKNESS,0x00CD00,'z','y')
+		pxpad.mesh.position.x=GAMEOFFSET
+		pxpad.mesh.rotation.y=Math.PI/2
+		var nxpad=new Paddle(PADWIDTH,PADTHICKNESS,0x0000ee,'z','y')
+		nxpad.mesh.position.x=-GAMEOFFSET
+		nxpad.mesh.rotation.y=Math.PI/2
+		var pypad=new Paddle(PADWIDTH,PADTHICKNESS,0x0000ee,'x','z')
+		pypad.mesh.position.y=GAMEOFFSET
+		pypad.mesh.rotation.x=Math.PI/2
+		var nypad=new Paddle(PADWIDTH,PADTHICKNESS,0xff0000,'x','z')
+		nypad.mesh.position.y=-GAMEOFFSET
+		nypad.mesh.rotation.x=Math.PI/2			
+
+		player1=new Player(pzpad,pxpad,MODE) //Green player
+		player2=new Player(nxpad,pypad,"ai") //Blue player
+		player3=new Player(nzpad,nypad,"ai") //Red player
+
+		ball=new Ball()
+		ball.velocity=randomize_velocity()
+
+		if (HELPERS)
+		{
+			pxh=new Ball()
+			pxh.position.x=GAMEOFFSET
+			pxh.mesh.material.color={r:.25,g:.25,b:0}
+			pxh.update=function(){
+				this.position.y=ball.position.y
+				this.position.z=ball.position.z
+				this.mesh.position=this.position
+			}
+			nxh=new Ball()
+			nxh.position.x=-GAMEOFFSET
+			nxh.mesh.material.color={r:.25,g:.25,b:0}
+			nxh.update=function(){
+				this.position.y=ball.position.y
+				this.position.z=ball.position.z
+				this.mesh.position=this.position
+			}
+			pyh=new Ball()
+			pyh.position.y=GAMEOFFSET
+			pyh.mesh.material.color={r:.25,g:.25,b:0}
+			pyh.update=function(){
+				this.position.x=ball.position.x
+				this.position.z=ball.position.z
+				this.mesh.position=this.position
+			}
+			nyh=new Ball()
+			nyh.position.y=-GAMEOFFSET
+			nyh.mesh.material.color={r:.25,g:.25,b:0}
+			nyh.update=function(){
+				this.position.x=ball.position.x
+				this.position.z=ball.position.z
+				this.mesh.position=this.position
+			}
+			pzh=new Ball()
+			pzh.position.z=GAMEOFFSET
+			pzh.mesh.material.color={r:.25,g:.25,b:0}
+			pzh.update=function(){
+				this.position.x=ball.position.x
+				this.position.y=ball.position.y
+				this.mesh.position=this.position
+			}
+			nzh=new Ball()
+			nzh.position.z=-GAMEOFFSET
+			nzh.mesh.material.color={r:.25,g:.25,b:0}
+			nzh.update=function(){
+				this.position.x=ball.position.x
+				this.position.y=ball.position.y
+				this.mesh.position=this.position
+			}
+		}
+
+		cake=true
+
+		function clip(x,lowbound,upbound)
+		{
+			if (x>upbound){
+				return upbound
+			}
+			else if (x<lowbound){
+				return lowbound
+			}
+			else{
+				return x
+			}
+		}
+		function scalify(x,lowbound,upbound)
+		{
+			return (((clip(x,lowbound,upbound)-lowbound)/((upbound-lowbound)/2)-1)*GAMEOFFSET)
+		}
+
+		leap.on('frame',function(handID, data){
+			//try{
+			if (data.hands.length>0 && data.hands[0].fingers[0])
+			{
+				var pos=data.hands[0].fingers[0].tip.position
+				var z=-scalify(pos[0],-100,100)
+				var y=scalify(pos[1],000,300)
+				var x=scalify(pos[2],-100,0)
+				leappos={x:x,y:y,z:z}
+			}
+			//}
+			//catch (TypeError)
+			//{
+
+			//}
+		})
+		function animate(){
+			document.getElementById("score").innerHTML="Score: "+score+"|--|Hi Score: "+hiscore
+			requestAnimationFrame(animate);
+			for (var i = 0; i < objlist.length; i++){
+				objlist[i].update()
+			}
+			renderer.render(scene,camera);
+		}
+
+		//debug shorthands.
+		var nx=nxpad
+		var ny=nypad
+		var nz=nzpad
+		var px=pxpad
+		var py=pypad
+		var pz=pzpad
+		function up(pad){pad.set_up_acceleration(1)}
+		function dn(pad){pad.set_up_acceleration(-1)}
+		function le(pad){pad.set_right_acceleration(-1)}
+		function ri(pad){pad.set_right_acceleration(1)}
+
+		animate()
+	</script>
+</html>
+

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<title>ÜberPong</title>
+		<link href='css/bootstrap.min.css' rel='stylesheet' media='screen'>
+	</head>
+	<body>
+		<p align='center'><img src='img/UberPong.png' style='padding:30px' width='600' align='center'/></p>
+		<div class='container-fluid'>
+			<div class='row-fluid'>
+				<div class='span4'>
+					<h2>Variants</h2>
+					<dl>
+						<dt><a data-toggle="modal" href='#leap'>Leap'd</a></dt>
+						<dd>Variant controlled using the <em>Leap Motion</em> sensor.</dd>
+						<dt><a data-toggle="modal" href='#human'>Sapien</a></dt>
+						<dd>Variant controlled using WASD and arrow key inputs.</dd>
+						<dt><a data-toggle="modal" href='#ai'>Robot</a></dt>
+						<dd>Watch the game AI play itself.</dd>
+					</dl>
+				</div>
+				<div class='span8'>
+				<h1>A Classic, now in mind-boggling 3D!</h1>
+					<p>
+						Why do we still fondly reminisce the days of retro gaming? Perhaps it is the simplicity, the quintissential zen of games like Pac Man, Pong, or Breakout, that create their appeal, back in the day before the development of complexities like storyline, game mechanics, and rankings. ÜberPong tries to integrate newer developments in gameplay technology, like 3d graphics and motion control, into an action-packed (or not) remix of a classic game.
+					</p>
+					<h1>About the Project</h1>
+					<p>
+						ÜberPong (originally Six Way Pong) is a project I developed for the November Hackers@Berkeley Hackathon. Originally, it was intended as my first experiment with the <a href=https://github.com/mrdoob/three.js>THREE.js</a> javascript 3-d graphics library. Under the oiginal design, it was going to be a three player online game. However, the opportunity arose to work with the Leap Motion API, particularly, the new JavaScript library. So I wrote a motion game instead.
+					</p>
+					<h1>About the Creator</h1>
+					<p>
+						<a href='http://www.ocf.berkeley.edu/~alchu'>Alex Chu</a> is a Electrical Engineering and Computer Science major at UC Berkeley. His interests include web development, game development, and talking about himself in the third person. He can be contacted at:
+						<p align='right'>
+						<address>
+							<a href='alex.p.chu@gmail.com'>alex.p.chu@gmail.com</a><br/>
+							2B51D, Building 2<br/>
+							2700 Hearst Ave.<br/>
+							Berkeley, CA, 94720-2292<br/>
+						</address>
+					</p>
+					</p>
+				</div>
+			</div>
+			<div class="modal hide fade in" id='leap'  style="display: none;">
+				<div class='modal-header'>
+					<a class='close' data-dismiss='modal'>x</a>
+					<h3>Variant: Leap'd</h3>
+				</div>
+				<div class='modal-body'>
+					<p><img src='img/leap_screenshot.png' width='300' height='300' align='right'/>
+					Take control of all six paddles with a wave of your hand! Simply position your finger above the leap motion sensor, and the paddles will follow. Try to keep the ball in play for as long as possible. The ball shadows are there to help with positioning.</p>
+				</div>
+				<div class='modal-footer'>
+					<a href='#' class='btn' data-dismiss='modal'>Close</a>
+					<a href='variants/leap.html' class='btn btn-success'>Launch</a>
+				</div>
+			</div>
+		</div>
+		<div class="modal hide fade in" id='human'  style="display: none;">
+				<div class='modal-header'>
+					<a class='close' data-dismiss='modal'>x</a>
+					<h3>Variant: Sapien</h3>
+				</div>
+				<div class='modal-body'>
+					<p><img src='img/human_screenshot.png' width='300' height='300' align='right'/>
+					Reminisce the glory days of retro gaming, when button mashing reigned supreme. Control the left and right green paddles with WASD and arrow key controls, respectively. Note: The AIs are programmed to be undefeatable. The object of the game is survival.</p>
+				</div>
+				<div class='modal-footer'>
+					<a href='#' class='btn' data-dismiss='modal'>Close</a>
+					<a href='variants/human.html' class='btn btn-success'>Launch</a>
+				</div>
+			</div>
+		</div>
+		<div class="modal hide fade in" id='ai'  style="display: none;">
+				<div class='modal-header'>
+					<a class='close' data-dismiss='modal'>x</a>
+					<h3>Variant: Robot</h3>
+				</div>
+				<div class='modal-body'>
+					<p><img src='img/ai_screenshot.png' width='300' height='300' align='right'/>
+					Sit back and relax as the AI plays against itself. Or start making inane WarGames references. We won't judge.</p>
+				</div>
+				<div class='modal-footer'>
+					<a href='#' class='btn' data-dismiss='modal'>Close</a>
+					<a href='variants/ai.html' class='btn btn-success'>Launch</a>
+				</div>
+			</div>
+		</div>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>  
+	<script src="js/bootstrap.js"></script>  
+	</body>
+</html>
