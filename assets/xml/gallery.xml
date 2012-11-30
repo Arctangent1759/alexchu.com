@@ -1,0 +1,67 @@
+<gallery>
+	<entry>
+		<title>ATAN6DF</title>
+		<description>Custom profile picture. Encodes my screen name, 'Arctangent1759'. hex(1759)=6DF.</description>
+		<path>assets/img/gal/gal_0.jpg</path>
+	</entry>
+	<entry>
+		<title>About Binary...</title>
+		<description>A general truth about things with binary on them.</description>
+		<path>assets/img/gal/gal_1.jpg</path>
+	</entry>
+	<entry>
+		<title>Totally not Clouds</title>
+		<description>Don't know what exactly I was thinking. Finished this at around 5AM.</description>
+		<path>assets/img/gal/gal_2.jpg</path>
+	</entry>
+	<entry>
+		<title>Build Sig</title>
+		<description>Originally intended as a forum signature for my robotics team.</description>
+		<path>assets/img/gal/gal_3.jpg</path>
+	</entry>
+	<entry>
+		<title>CAD Sig</title>
+		<description>Originally intended as a forum signature for my robotics team.</description>
+		<path>assets/img/gal/gal_4.jpg</path>
+	</entry>
+	<entry>
+		<title>Electronics Sig</title>
+		<description>Originally intended as a forum signature for my robotics team.</description>
+		<path>assets/img/gal/gal_5.jpg</path>
+	</entry>
+	<entry>
+		<title>Programming Sig</title>
+		<description>Originally intended as a forum signature for my robotics team.</description>
+		<path>assets/img/gal/gal_6.jpg</path>
+	</entry>
+	<entry>
+		<title>1759</title>
+		<description>A robotics logo contest entry. The shape comes from the keystrokes to type our team number on a keypad.</description>
+		<path>assets/img/gal/gal_7.jpg</path>
+	</entry>
+	<entry>
+		<title>Autodesk Cup</title>
+		<description>A model of a mug, created on Autodesk Inventor.</description>
+		<path>assets/img/gal/gal_8.jpg</path>
+	</entry>
+	<entry>
+		<title>Robotics Background</title>
+		<description>Desktop background with our robotics insignia.</description>
+		<path>assets/img/gal/gal_9.jpg</path>
+	</entry>
+	<entry>
+		<title>Eye of the Machine</title>
+		<description>Tired. Bored. Draw.</description>
+		<path>assets/img/gal/gal_10.jpg</path>
+	</entry>
+	<entry>
+		<title>Robosaurs</title>
+		<description>Attempt at Typography.</description>
+		<path>assets/img/gal/gal_11.jpg</path>
+	</entry>
+	<entry>
+		<title>Wild Robosaurs</title>
+		<description>The velociraptors have escaped.</description>
+		<path>assets/img/gal/gal_12.jpg</path>
+	</entry>
+</gallery>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'/>
+		<title>Alex Chu</title>
+		<link href='assets/css/bootstrap.min.css' rel='stylesheet' media='screen'/>
+	</head>
+	<body>
+
+		<!--Title Content-->
+		<br/>
+		<br/>
+		<center>
+			<div style="width: 100%; overflow:auto; background-color:#003366; layer-background-color:#003366; visibility: visible">
+				<div style='max-width:1000px;'>
+					<img align='left' src='assets/img/writings.png'></img>
+				</div>
+			</div>
+		</center>
+		<!--Page Content-->
+		<div class='container-fluid'>
+			<div class='row-fluid'>
+				<div class='span2'>
+					<!--Sidebar-->
+				</div>
+				<div class='span8'>
+					<div class='body'></div>
+				</div>
+				<div class='span2'>
+				</div>
+			</div>
+		</div>
+
+		<!--Script imports-->
+		<script src="assets/js/jquery-1.8.3.min.js"></script>  
+		<script src="assets/js/bootstrap.js"></script>  
+		<script src="assets/js/navbar.js"></script>
+		<script type='text/javascript'>
+			if (window.XMLHttpRequest)
+			{
+				var xmlhttp=new XMLHttpRequest();
+			}
+			else
+			{
+				var xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			xmlhttp.open("GET",'assets/xml/essays.xml',false);
+			xmlhttp.send();
+			var essays=xmlhttp.responseXML;
+			var essaylist=[]
+			var essaysbygrade=Object()
+			function getNodeText(node) {
+			    var r = "";
+			    for (var x = 0;x < node.childNodes.length; x++) {
+			        r = r + node.childNodes[x].nodeValue;
+			    }
+			    return r;
+			}
+			$('document').ready(function(){
+				$(essays).find('essay').each(function(){
+					essaylist.push({title:$(this).find('title')[0].childNodes[0].nodeValue,
+					grade:$(this).find('grade')[0].childNodes[0].nodeValue,
+					text:getNodeText($(this).find('text')[0])})
+				})
+				essaylist.forEach(function(ess){
+					grade=ess.grade
+					if (grade in essaysbygrade){
+						essaysbygrade[grade].push(ess)
+					}
+					else
+					{
+						essaysbygrade[grade]=[ess]
+					}
+				})
+				for (var grd in essaysbygrade){
+					var essdiv=""
+					essdiv=essdiv.concat('<div class="ess">')
+					essdiv=essdiv.concat('<h2 class="essgrade">'+grd+'<div style="float: right"><a class="btn btn-small showtitles"  href="#">Show</a></div></h2>')
+					for (var i in essaysbygrade[grd]){
+						essdiv=essdiv.concat('<h4 class="esstitle">'+essaysbygrade[grd][i].title+'<div style="float: right"><a class="btn btn-mini showessay"  href="#">Show</a></div></h4>')
+						essdiv=essdiv.concat('<p class="essbody">'+essaysbygrade[grd][i].text+'</p>')
+					}
+					essdiv=essdiv.concat('</div>')
+					$('.body').append(essdiv)
+				}
+				$('.esstitle').hide()
+				$('.essbody').hide()
+				$('.showtitles').click(
+					function(e){
+						this.innerHTML=(this.innerHTML=="Hide"?"Show":"Hide")
+						$(this).parents('.ess').find('.esstitle').toggle('medium')
+						$(this).parents('.ess').find('.essbody').hide('slow')
+						$(this).parents('.ess').find('.showessay').each(function(){this.innerHTML="Show"})
+						e.preventDefault()
+					}
+				)
+				$('.showessay').click(
+					function(e){
+						$(this).scrollTop()
+						this.innerHTML=(this.innerHTML=="Hide"?"Show":"Hide")
+						$(this).parents('.esstitle').next().toggle('medium')
+						if (this.innerHTML=="Hide"){
+							$("html, body").animate({scrollTop:($(this).offset().top-100)},500,"linear");
+						}
+						e.preventDefault()
+					}
+				)
+			})
+			
+		</script>
+	</body>
+</html>

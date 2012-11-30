@@ -22,6 +22,15 @@ $('document').ready(function(){
 					<li><a href='https://github.com/Arctangent1759'>Github</a></li>\
 					<li><a href='bio.html'>Bio</a></li>\
 					<li><a href='assets/doc/resume.pdf'>Resumé</a></li>\
+					<li class='dropdown'>\
+						<a href='#' class='dropdown-toggle' data-toggle='dropdown'>Extras<b class='caret'></b></a>\
+						<ul class='dropdown-menu'>\
+							<li><a href='writings.html'>Writings</a></li>\
+							<li><a href='gallery.html'>Gallery</a></li>\
+							<li class='divider'></li>\
+							<li><a href='extras.html'>Extras Main</a></li>\
+						</ul>\
+					</li>\
 					<li><a href='contact.html'>Contact</a></li>\
 				</ul>\
 			</div>\
