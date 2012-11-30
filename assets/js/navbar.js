@@ -2,7 +2,7 @@ $('document').ready(function(){
 		currfile=window.location.pathname.split('/').pop()
 		if (currfile=="")
 		{
-			currfile=index.html	
+			currfile='index.html'
 		}
 
 		$('body').append("\
