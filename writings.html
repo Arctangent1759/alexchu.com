@@ -78,17 +78,20 @@
 					essdiv=essdiv.concat('<h2 class="essgrade">'+grd+'<div style="float: right"><a class="btn btn-small showtitles"  href="#">Show</a></div></h2>')
 					for (var i in essaysbygrade[grd]){
 						essdiv=essdiv.concat('<h4 class="esstitle">'+essaysbygrade[grd][i].title+'<div style="float: right"><a class="btn btn-mini showessay"  href="#">Show</a></div></h4>')
+						essdiv=essdiv.concat('<p class="esspreview">'+essaysbygrade[grd][i].text.slice(0,250)+'[...]</p>')
 						essdiv=essdiv.concat('<p class="essbody">'+essaysbygrade[grd][i].text+'</p>')
 					}
 					essdiv=essdiv.concat('</div>')
 					$('.body').append(essdiv)
 				}
 				$('.esstitle').hide()
+				$('.esspreview').hide()
 				$('.essbody').hide()
 				$('.showtitles').click(
 					function(e){
 						this.innerHTML=(this.innerHTML=="Hide"?"Show":"Hide")
 						$(this).parents('.ess').find('.esstitle').toggle('medium')
+						$(this).parents('.ess').find('.esspreview').toggle('medium')
 						$(this).parents('.ess').find('.essbody').hide('slow')
 						$(this).parents('.ess').find('.showessay').each(function(){this.innerHTML="Show"})
 						e.preventDefault()
@@ -99,6 +102,7 @@
 						$(this).scrollTop()
 						this.innerHTML=(this.innerHTML=="Hide"?"Show":"Hide")
 						$(this).parents('.esstitle').next().toggle('medium')
+						$(this).parents('.esstitle').next().next().toggle('medium')
 						if (this.innerHTML=="Hide"){
 							$("html, body").animate({scrollTop:($(this).offset().top-100)},500,"linear");
 						}
