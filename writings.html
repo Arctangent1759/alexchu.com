@@ -78,7 +78,7 @@
 					essdiv=essdiv.concat('<h2 class="essgrade">'+grd+'<div style="float: right"><a class="btn btn-small showtitles"  href="#">Show</a></div></h2>')
 					for (var i in essaysbygrade[grd]){
 						essdiv=essdiv.concat('<h4 class="esstitle">'+essaysbygrade[grd][i].title+'<div style="float: right"><a class="btn btn-mini showessay"  href="#">Show</a></div></h4>')
-						essdiv=essdiv.concat('<p class="esspreview">'+essaysbygrade[grd][i].text.slice(0,250)+'[...]</p>')
+						essdiv=essdiv.concat('<p class="esspreview">'+essaysbygrade[grd][i].text.slice(0,250)+'...</p>')
 						essdiv=essdiv.concat('<p class="essbody">'+essaysbygrade[grd][i].text+'</p>')
 					}
 					essdiv=essdiv.concat('</div>')
