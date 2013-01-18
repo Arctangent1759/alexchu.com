@@ -87,12 +87,14 @@
 				$('#showslideshow').click(function(e){
 					$('#display').toggle('fade')
 					$('#index').hide('fade')
+					$("html, body").animate({scrollTop:(0)},500,"linear");
 					$("html, body").animate({scrollTop:($('#display').offset().top-70)},500,"linear");
 					e.preventDefault()
 				})
 				$('#showindex').click(function(e){
 					$('#index').toggle('fade')
 					$('#display').hide('fade')
+					$("html, body").animate({scrollTop:(0)},500,"linear");
 					$("html, body").animate({scrollTop:($('#index').offset().top-70)},500,"linear");
 					e.preventDefault()
 				})
